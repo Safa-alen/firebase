@@ -6,10 +6,14 @@ class textField extends StatefulWidget {
     required this.hint,
     this.obscureText = false,
     required this.controller,
+    required this.keyboardType,
+    // required this.val,
   });
   final String hint;
+  // final String val;
   final bool obscureText;
   final TextEditingController controller;
+  final TextInputType keyboardType;
   @override
   State<textField> createState() => _textFieldState(); //arwani@gmail.com
 }
@@ -25,7 +29,11 @@ class _textFieldState extends State<textField> {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: TextField(
-            controller: TextEditingController(),
+            // onChanged: (value) {
+            //   value = widget.val;
+            // },
+            keyboardType: widget.keyboardType,
+            controller: widget.controller,
             obscureText: widget.obscureText,
             decoration: InputDecoration(
                 border: InputBorder.none, hintText: widget.hint),
