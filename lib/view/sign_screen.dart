@@ -1,5 +1,4 @@
 import 'package:firebase/view/wedget/text_field.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
@@ -17,31 +16,14 @@ class _SignScreenState extends State<SignScreen> {
   final _auth = FirebaseAuth.instance;
   bool isLoading = false;
 
-  @override
-  void dispose() {
-    emailController.dispose();
-    passwordController.dispose();
-    super.dispose();
-  }
 
-  // @override
-  // Future<void> signIn() async {
-  //   try {
-  //     await FirebaseAuth.instance.signInWithEmailAndPassword(
-  //       email: emailController.text.trim(),
-  //       password: passwordController.text.trim(),
-  //     );
-  //   } on FirebaseAuthException catch (e) {
-  //     print('خطأ في تسجيل الدخول: ${e.message}');
-  //   }
-  // }
 
   Widget build(BuildContext context) {
-    return ModalProgressHUD(
-      inAsyncCall: isLoading,
-      child: Scaffold(
-        backgroundColor: const Color.fromARGB(255, 219, 225, 244),
-        body: SafeArea(
+    return Scaffold(
+      backgroundColor: const Color.fromARGB(255, 219, 225, 244),
+      body: ModalProgressHUD(
+        inAsyncCall: isLoading,
+        child: SafeArea(
           child: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -84,18 +66,27 @@ class _SignScreenState extends State<SignScreen> {
                         });
 
                         try {
-                          final user =
-                              await _auth.createUserWithEmailAndPassword(
+                          final user = await _auth.signInWithEmailAndPassword(
+                            //لازم كون بعرف كلمة السر
                             email: emailController.text.trim(),
                             password: passwordController.text.trim(),
                           );
-
-                          Navigator.of(context).pushNamed("homescreen");
                           setState(() {
                             isLoading = false;
                           });
+
+                          Navigator.of(context).pushNamed("chat_screen");
                         } catch (e) {
-                          print(e);
+                          setState(() {
+                            isLoading = false;
+                          });
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                                content:
+                                    Text("فشل تسجيل الدخول: ${e.toString()}")),
+                          );
+
+                          print("فشل تسجيل الدخول: ${e.toString()}");
                         }
                       },
                       child: Center(child: Text("Sign In")),

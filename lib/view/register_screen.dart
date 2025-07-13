@@ -17,19 +17,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _auth = FirebaseAuth.instance;
   bool isLoading = false;
 
-  @override
-  void dispose() {
-    emailController.dispose();
-    passwordController.dispose();
-    super.dispose();
-  }
+  // @override
+  // void dispose() {
+  //   emailController.dispose();
+  //   passwordController.dispose();
+  //   super.dispose();
+  // }
 
   Widget build(BuildContext context) {
-    return ModalProgressHUD(
-      inAsyncCall: isLoading,
-      child: Scaffold(
-        backgroundColor: const Color.fromARGB(255, 219, 225, 244),
-        body: SafeArea(
+    return Scaffold(
+      backgroundColor: const Color.fromARGB(255, 219, 225, 244),
+      body: ModalProgressHUD(
+        inAsyncCall: isLoading,
+        child: SafeArea(
           child: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -72,17 +72,25 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         });
 
                         try {
-                          final user =
+                          final newuser = //لاول مرة
                               await _auth.createUserWithEmailAndPassword(
                             email: emailController.text.trim(),
                             password: passwordController.text.trim(),
                           );
-
-                          Navigator.of(context).pushNamed("homescreen");
                           setState(() {
                             isLoading = false;
                           });
+
+                          Navigator.of(context).pushNamed("chat_screen");
                         } catch (e) {
+                          setState(() {
+                            isLoading = false;
+                          });
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                                content:
+                                    Text("فشل تسجيل الدخول: ${e.toString()}")),
+                          );
                           print(e);
                         }
                       },

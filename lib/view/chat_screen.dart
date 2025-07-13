@@ -15,7 +15,6 @@ class _ChatScreenState extends State<ChatScreen> {
   final _auth = FirebaseAuth.instance; //للمصداقية
   final _firestor = FirebaseFirestore.instance;
   TextEditingController messagecontroller = TextEditingController();
-  //late User signedInUser; //هاد يلي بدو يعطيني الايميل
   @override
   void initState() {
     super.initState();
@@ -27,27 +26,20 @@ class _ChatScreenState extends State<ChatScreen> {
       final user = _auth.currentUser;
       if (user != null) {
         signedInUser = user;
-        // print(signedInUser.email);
       }
     } catch (e) {
       print(e);
     }
   }
 
-  // void getMessages() async {
-  //   final messages = await _firestor.collection("messages").get();
-  //   for (var message in messages.docs) {
-  //     print(message.data());
-  //   }
-  // }
-  // void getmessagesStreams() async {
-  //   await for (var snapshot in _firestor.collection("messages").snapshots()) {
-  //     //
-  //     for (var message in snapshot.docs) {
-  //       print(message.data());
-  //     }
-  //   }
-  // }
+  void getmessagesStreams() async {
+    await for (var snapshot in _firestor.collection("messages").snapshots()) {
+      //نسخة من الرسايل
+      for (var message in snapshot.docs) {
+        print(message.data());
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -111,9 +103,6 @@ class _ChatScreenState extends State<ChatScreen> {
                     ),
                     TextButton(
                         onPressed: () {
-                          // final messageText = messagecontroller.text.trim();
-                          // if (messageText.isNotEmpty &&
-                          //     signedInUser.email != null)
                           _firestor.collection("messages").add({
                             "text": messagecontroller.text,
                             "sender": signedInUser.email,
@@ -150,10 +139,15 @@ class MessageStreamBuilder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
-        stream: _firestor.collection("messages").orderBy('time').snapshots(),
+        //ويدجت بتراقب البيانات يلي عم تجي من Firestore (بشكل مباشر، يعني real-time)، وبتبني الواجهة حسبها كل ما تغيرت البيانات.
+
+        stream: _firestor.collection('messages').orderBy('time').snapshots(),
         builder: (context, snapshot) {
-          List<Widget> messagewidgets = [];
+          List<Widget> messagewidgets =
+              []; //كل عنصر فيها رح يمثل رسالة واحدة في الدردشة (chat bubble)
           if (!snapshot.hasData) {
+            //🔸 إذا البيانات لسا ما وصلت (Firestore عم يحمل)، بنعرض دائرة تحميل.
+
             return Center(
               child: CircularProgressIndicator(
                 backgroundColor: Colors.blueAccent,
@@ -172,11 +166,13 @@ class MessageStreamBuilder extends StatelessWidget {
               isMe: messageSender == curentUser,
             );
 
-            messagewidgets.add(messageWidget);
+            messagewidgets.add(
+                messageWidget); //يضيف (الرسالة) إلى القائمة messagewidgets.
           }
           return Expanded(
               child: ListView(
-                  reverse: true,
+                  reverse: true, //العناصر تبدأ من الأسفل إلى الأعلى.
+
                   padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
                   children: messagewidgets));
         });

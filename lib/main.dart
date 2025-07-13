@@ -14,7 +14,7 @@ void main() async {
       //     apiKey: "AIzaSyAa8UpVYutktDByrs2nskjswWQ1bGzt1EA",
       //     appId: "1:834322050540:android:9845790a058dee2e1524c9",
       //     messagingSenderId: "834322050540",
-      //     projectId: "fir-d4ea9")
+      //     projectId: "fir-d4ea9")// هاد الحكي غير ضروري بسبب استخدام الملف
       );
   runApp(MyApp());
 }
@@ -24,15 +24,14 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      //  theme: ThemeData.light(),
       debugShowCheckedModeBanner: false,
 
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      // home: WelcomeScreen(),
-      initialRoute:
-          _auth.currentUser != null ? "chat_screen" : "welcome_screen",
+      initialRoute: _auth.currentUser != null
+          ? "chat_screen"
+          : "welcome_screen", //currentuser المستخدم الحالي يلي مسجل دخول
       routes: {
         "chat_screen": (context) => ChatScreen(),
         "sign_screen": (context) => SignScreen(),
